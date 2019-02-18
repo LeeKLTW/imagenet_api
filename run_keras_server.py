@@ -18,7 +18,15 @@ def load_model():
 
 
 def prepare_image(image, target):
-    pass
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+
+    image = image.resize(target)
+    image = img_to_array(image)
+    image = np.expand_dims(image, axis=0)
+    image = imagenet_util.preprocess_input(image)
+
+    return image
 
 
 def predict():
