@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.applications import imagenet_util
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 from PIL import Image
 import numpy as np
 import flask
@@ -24,7 +24,7 @@ def prepare_image(image, target):
     image = image.resize(target)
     image = img_to_array(image)
     image = np.expand_dims(image, axis=0)
-    image = imagenet_util.preprocess_input(image)
+    image = preprocess_input(image)
 
     return image
 
@@ -41,7 +41,7 @@ def predict():
 
             preds = model.predict(image)
 
-            results = imagenet_util.decode_predictions(preds)
+            results = decode_predictions(preds)
             data['predictions'] = []
 
             for (imagenetID, label, prob) in results[0]:
