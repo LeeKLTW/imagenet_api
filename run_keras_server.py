@@ -1,5 +1,5 @@
 # encoding: utf-8
-
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
@@ -15,6 +15,8 @@ model = None
 def load_model():
     global model
     model = ResNet50(weights='imagenet')
+    global graph
+    graph = tf.get_default_graph()
 
 
 def prepare_image(image, target):
@@ -39,7 +41,8 @@ def predict():
 
             image = prepare_image(image, target=(224, 224))
 
-            preds = model.predict(image)
+            with graph.as_default():
+                preds = model.predict(image)
 
             results = decode_predictions(preds)
             data['predictions'] = []
@@ -55,4 +58,4 @@ def predict():
 
 if __name__ == '__main__':
     load_model()
-    app.run()
+    app.run(debug=True)
