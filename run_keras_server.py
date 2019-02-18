@@ -29,8 +29,28 @@ def prepare_image(image, target):
     return image
 
 
+@app.route("/predict", methods=['POSt'])
 def predict():
-    pass
+    data = {'success': False}
+    if flask.request.method == "POST":
+        if flask.request.files.get("image"):
+            image = flask.request.files('image').read()
+            image = Image.open(io.BytesIO(image))
+
+            image = prepare_image(image, target=(224, 224))
+
+            preds = model.predict(image)
+
+            results = imagenet_util.decode_predictions(preds)
+            data['predictions'] = []
+
+            for (imagenetID, label, prob) in results[0]:
+                r = {'label': label, "probability": float(prob)}
+                data["predictions"].append(r)
+
+            data['success'] = True
+
+    return flask.jsonify(data)
 
 
 if __name__ == '__main__':
